@@ -3,7 +3,12 @@ name = "pyswc-rust"
 version = "0.0.0"
 edition = "2021"
 
+[lib]
+name = "pyswc"
+crate-type = ["cdylib"]
+
 [dependencies]
+pyo3 = { version = "0.15.1", features = ["extension-module"] }
 swc = "0.97.0"
 swc_common = { version = "0.15.0", features = ["tty-emitter"] }
 swc_ecma_minifier = "0.60.0"

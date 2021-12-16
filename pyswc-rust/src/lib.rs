@@ -1,14 +1,24 @@
-use std::path::Path;
+use pyo3::prelude::*;
 use std::sync::Arc;
 use swc::Compiler;
 use swc::config::{JsMinifyOptions, JsMinifyFormatOptions};
 use swc::config::util::BoolOrObject;
 use swc_common::SourceMap;
 use swc_common::errors::{ColorConfig, Handler};
+use swc_common::source_map::FileName;
 use swc_ecma_minifier::option::terser::TerserEcmaVersion;
 
 
-fn main() {
+#[pymodule]
+fn pyswc(_py: Python, m: &PyModule) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(minify, m)?)?;
+
+    Ok(())
+}
+
+
+#[pyfunction]
+fn minify(filename: String, src: String) -> PyResult<String> {
     let cm = Arc::<SourceMap>::default();
     let handler = Arc::new(Handler::with_tty_emitter(
         ColorConfig::Auto,
@@ -18,9 +28,7 @@ fn main() {
     ));
     let c = Compiler::new(cm.clone());
 
-    let fm = cm
-        .load_file(Path::new("foo.js"))
-        .expect("failed to load file");
+    let fm = cm.new_source_file(FileName::Custom(filename), src);
 
     let transformed = c.minify(
         fm,
@@ -63,5 +71,6 @@ fn main() {
         },
     )
     .expect("failed to process file");
-    print!("{}\n", transformed.code);
+
+    Ok(transformed.code)
 }
