@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 swc = "0.97.0"
 swc_common = { version = "0.15.0", features = ["tty-emitter"] }
+swc_ecma_minifier = "0.60.0"
